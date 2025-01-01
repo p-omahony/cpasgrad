@@ -126,6 +126,7 @@ std::shared_ptr<Tensor> Tensor::sum(const std::shared_ptr<Tensor>& t){
 
     std::shared_ptr<Tensor> out_tensor = std::make_shared<Tensor> (1, 1, data);
     out_tensor ->  set_prev(t);
+    out_tensor -> set_prev(t);
 
     out_tensor -> grad_fn = [t] {
         t -> set_grad(ones(t -> m_rows, t -> m_cols));
@@ -137,27 +138,19 @@ std::shared_ptr<Tensor> Tensor::sum(const std::shared_ptr<Tensor>& t){
 void Tensor::backward(){
     std::shared_ptr<Tensor> t = prev;
     std::vector<std::shared_ptr<Tensor>> topo = {};
+    std::function<void()> _grad_fn = grad_fn;
+
+    _grad_fn();
     while (true) {
         if (t == nullptr){
             break;
         }else {
-            t -> print();
-            topo.push_back(t);
-            t = t -> get_prev();
-        }
-    }
-    std::cout << "The length of the vector is: " << topo.size() << std::endl;
+            _grad_fn = t -> get_gradfn();
+            if (_grad_fn != nullptr){
+                _grad_fn();
+            }
 
-    std::function<void()> _grad_fn = grad_fn;
-    grad_fn();
-    for (int i=0; i < topo.size(); i++){
-        topo[i] -> print();
-        _grad_fn = topo[i] -> get_gradfn();
-        if (_grad_fn != nullptr){
-            std::cout << "yo" <<std::endl;
-            _grad_fn();
-        }else{
-            std::cout << "end" << std::endl;
+            t = t -> get_prev();
         }
     }
 }
