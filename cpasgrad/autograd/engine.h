@@ -11,7 +11,7 @@
 #include <tuple>
 
 
-class Tensor {
+class Tensor:  public std::enable_shared_from_this<Tensor>{
 
   public:
     Tensor(int rows, int cols, std::vector<float> data);
@@ -25,17 +25,23 @@ class Tensor {
 
     std::vector<float> get_data();
 
-    void set_grad(std::shared_ptr<Tensor> grad_value);
+    void set_grad(const std::shared_ptr<Tensor>& grad_value);
     std::shared_ptr<Tensor> get_grad();
 
-    void set_grad_fn(const std::function<void()> &fn);
+    void set_prev(const std::shared_ptr<Tensor>& prev_t);
+    std::shared_ptr<Tensor> get_prev();
+
+    void set_grad_fn(const std::function<void()>& fn);
     std::function<void()> get_gradfn();
 
     std::shared_ptr<Tensor> transpose();
 
-    static std::shared_ptr<Tensor> ones(int rows, int cols);
-    static std::shared_ptr<Tensor> sum(std::shared_ptr<Tensor> t);
-    static std::shared_ptr<Tensor> matmul(std::shared_ptr<Tensor> t1, std::shared_ptr<Tensor> t2);
+    void backward();
+
+    static std::shared_ptr<Tensor> ones(const int& rows, const int& cols);
+    static std::shared_ptr<Tensor> randn(const int& rows, const int& cols);
+    static std::shared_ptr<Tensor> sum(const std::shared_ptr<Tensor>& t);
+    static std::shared_ptr<Tensor> matmul(const std::shared_ptr<Tensor>& t1, const std::shared_ptr<Tensor>& t2);
 
   private:
     int m_rows;
