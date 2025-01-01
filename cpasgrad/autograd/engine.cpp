@@ -117,15 +117,7 @@ std::shared_ptr<Tensor> Tensor::matmul(const std::shared_ptr<Tensor>& t1, const 
 }
 
 std::shared_ptr<Tensor> Tensor::sum(const std::shared_ptr<Tensor>& t){
-    std::vector<float> data = {};
-    float sum = 0;
-    for(int i=0; i<t -> m_rows*t -> m_cols; i++){
-        sum += t -> m_data[i];
-    }
-    data.push_back(sum);
-
-    std::shared_ptr<Tensor> out_tensor = std::make_shared<Tensor> (1, 1, data);
-    out_tensor ->  set_prev(t);
+    std::shared_ptr<Tensor> out_tensor = inner_sum(t);
     out_tensor -> set_prev(t);
 
     out_tensor -> grad_fn = [t] {
