@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "../functional/operations.cpp"
 #include <functional>
 #include <memory>
 #include <iostream>
